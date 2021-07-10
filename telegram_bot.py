@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!python3
 # pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
@@ -25,7 +25,7 @@ config.read("settings.ini")
 
 
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
 )
 
 logger = logging.getLogger(__name__)
@@ -63,8 +63,10 @@ def menu_actions(update: Update, context: CallbackContext) -> None:
 
     if query.data == 'exit':
         game_on = False
+        msg = '\U0001F916 \U0001F300  \U0001F601 \U0001F60D\n'
         update.callback_query.message.edit_text(
-            f'{update.effective_user.first_name} Goodbye, do a better job')
+            f'{update.effective_user.first_name} {msg} Goodbye, do a better job')
+
 
 
 def help_command(update: Update, context: CallbackContext) -> None:
@@ -78,14 +80,17 @@ def exit_command(update: Update, context: CallbackContext) -> None:
 
 
 def echo(update: Update, context: CallbackContext) -> None:
+    chat_id = update.message.chat_id
+    print('chat_id = @@@@@@@@@@@@@@@@@@@@@@',chat_id)
     global game_on, word_sought, word_unknown, error, errors_max
     if game_on == True:
         if (not len(update.message.text) == 1) | update.message.text.isdigit():
             update.message.reply_text(
                 f'Error input... <{update.message.text}> pls ONE letter ')
         if error == errors_max+1:
+            msg = '\U0001F614'
             update.message.reply_text(
-                f"You didn't guess the word <{word_sought}> <{word_unknown}>")
+                f"You didn't guess the word <{word_sought}> <{word_unknown}> {msg}")
             game_on = False
         elif (error < errors_max+1) & (not word_unknown == word_sought):
             input_letter = update.message.text.lower()
@@ -94,7 +99,7 @@ def echo(update: Update, context: CallbackContext) -> None:
             if len(indexes_find) == 0:
                 error += 1
                 update.message.reply_text(
-                    f'There is no such letter {update.message.text} in the word {word_unknown} Attempts left {errors_max-error}')
+                    f'There is no such letter {update.message.text} in the word {word_unknown} Attempts left {errors_max+1-error}')
             else:
                 list_word_unknown = list(word_unknown)
                 for idx in indexes_find:
@@ -104,7 +109,7 @@ def echo(update: Update, context: CallbackContext) -> None:
                     f'There is such a letter!!!  {word_unknown}')
                 if word_unknown == word_sought:
                     update.message.reply_text(
-                        f'Congratulations, you guessed the word <{word_unknown}>')
+                        f'Congratulations, you guessed the word <{word_unknown}>')                    
                     game_on = False
 
     else:
