@@ -10,6 +10,7 @@ __pycache__/
 .Python
 build/
 develop-eggs/
+env_python39/
 dist/
 downloads/
 eggs/
@@ -127,3 +128,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+.DS_Store
