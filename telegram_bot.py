@@ -17,7 +17,9 @@ import configparser
 from telegram import Update, ForceReply, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext, CallbackQueryHandler, CommandHandler, Filters, MessageHandler, Updater
 
-from game_gallow import get_random_word as get_word
+
+from game_gallow import GameGallow
+from game_gallow import letter_from_player
 
 
 config = configparser.ConfigParser()
@@ -30,12 +32,9 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-game_on = False
 
-word_sought: str
-word_unknown: str
-error = 0
-errors_max = 10
+
+players_games = {}
 
 
 # Define a few command handlers. These usually take the two arguments update and
@@ -52,21 +51,18 @@ def start(update: Update, context: CallbackContext) -> None:
 
 def menu_actions(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
-    global game_on, word_sought, word_unknown, error
+    global players_games
+    chat_id = update.effective_user.id
     if query.data == 'start_game_gallows':
-        game_on = True
-        word_sought = get_word()
-        word_unknown = '-' * len(word_sought)
-        error = 0
+        players_games[chat_id] = GameGallow()
         update.callback_query.message.edit_text(
-            f"{update.effective_user.first_name} Let's start playing!!! Guess the word  {word_unknown}?")
+            f"{update.effective_user.first_name} Let's start playing!!! Guess the word  {players_games[chat_id].word_unknown}?")
 
     if query.data == 'exit':
         game_on = False
         msg = '\U0001F916 \U0001F300  \U0001F601 \U0001F60D\n'
         update.callback_query.message.edit_text(
             f'{update.effective_user.first_name} {msg} Goodbye, do a better job')
-
 
 
 def help_command(update: Update, context: CallbackContext) -> None:
@@ -76,67 +72,48 @@ def help_command(update: Update, context: CallbackContext) -> None:
 
 def exit_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /exit is issued."""
-    update.message.reply_text('Exit')
+    global players_games
+
+    if update.effective_user.id in players_games:
+        players_games.pop(update.effective_user.id)
+
+    update.message.reply_text(f'Delete id = {update.effective_user.id} and Exit')
+
+def stat_command(update: Update, context: CallbackContext) -> None:
+    """Send a message when the command /stat is issued."""
+    global players_games
+    msg = '\U0001F300 \n'
+    for key in players_games:
+        msg+= f'Player: {key} \U0001F60D\n'
+        print(players_games[key])
+        msg+= str(players_games[key])
+    update.message.reply_text(f'Stat game {msg}\n')
 
 
-def echo(update: Update, context: CallbackContext) -> None:
+def game_gallow(update: Update, context: CallbackContext) -> None:
+    global players_games
     chat_id = update.message.chat_id
-    print('chat_id = @@@@@@@@@@@@@@@@@@@@@@',chat_id)
-    global game_on, word_sought, word_unknown, error, errors_max
-    if game_on == True:
-        if (not len(update.message.text) == 1) | update.message.text.isdigit():
-            update.message.reply_text(
-                f'Error input... <{update.message.text}> pls ONE letter ')
-        if error == errors_max+1:
-            msg = '\U0001F614'
-            update.message.reply_text(
-                f"You didn't guess the word <{word_sought}> <{word_unknown}> {msg}")
-            game_on = False
-        elif (error < errors_max+1) & (not word_unknown == word_sought):
-            input_letter = update.message.text.lower()
-            indexes_find = [m.start()
-                            for m in re.finditer(input_letter, word_sought)]
-            if len(indexes_find) == 0:
-                error += 1
-                update.message.reply_text(
-                    f'There is no such letter {update.message.text} in the word {word_unknown} Attempts left {errors_max+1-error}')
-            else:
-                list_word_unknown = list(word_unknown)
-                for idx in indexes_find:
-                    list_word_unknown[idx] = input_letter
-                word_unknown = "".join(list_word_unknown)
-                update.message.reply_text(
-                    f'There is such a letter!!!  {word_unknown}')
-                if word_unknown == word_sought:
-                    update.message.reply_text(
-                        f'Congratulations, you guessed the word <{word_unknown}>')                    
-                    game_on = False
-
-    else:
-        update.message.reply_text(
-            "You don't want to work but want to play? decide click /start")
+    print('chat_id = ', chat_id)
+    update.message.reply_text(letter_from_player(
+        chat_id, update.message.text, players_games))
 
 
 def main() -> None:
-    """Start the bot."""
-    # Create the Updater and pass it your bot's token.
-    print(config["Telegram"]["token"])
     updater = Updater(
         config["Telegram"]["token"], use_context=True)
-
-    # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
 
-    # on different commands - answer in Telegram
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("help", help_command))
     dispatcher.add_handler(CommandHandler("exit", exit_command))
+
+    dispatcher.add_handler(CommandHandler("stat", stat_command))
 
     dispatcher.add_handler(CallbackQueryHandler(menu_actions))
 
     # on non command i.e message - echo the message on Telegram
     dispatcher.add_handler(MessageHandler(
-        Filters.text & ~Filters.command, echo))
+        Filters.text & ~Filters.command, game_gallow))
 
     # Start the Bot
     updater.start_polling()
