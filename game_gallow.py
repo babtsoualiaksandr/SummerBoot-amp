@@ -3,14 +3,9 @@ import random
 import re
 
 
-def get_random_word() -> str:
-    words = ('епам', 'лето', 'змея', 'лекция', 'учеба', 'задания', 'язык', 'английский',
-             'вебинар', 'книги', 'документация', 'получение', 'удаленная', 'работа', 'успех', 'спасибо')
-    random.seed()
-    return words[random.randint(0, len(words)-1)]
 
 
-class PlayerGame:
+class GameGallow:
     def __init__(self) -> None:
         words = ('епам', 'лето', 'змея', 'лекция', 'учеба', 'задания', 'язык', 'английский',
                  'вебинар', 'книги', 'документация', 'получение', 'удаленная', 'работа', 'успех', 'спасибо')
@@ -23,10 +18,9 @@ class PlayerGame:
 
     def trying_guess(self, letter: str) -> str:
         if not self.state == 'continues':
-            return f'Game over {self.state}'
+            return f'Game over {self.state} click /start or /exit'
         if (not len(letter) == 1) | letter.isdigit():
-            return f'Error input... <{letter}> pls ONE letter '
-
+            return f'Error input... <{letter}> pls enter ONE letter '
         indexes_find = [m.start()
                         for m in re.finditer(letter, self.word_sought)]
         if len(indexes_find) == 0:
@@ -49,15 +43,19 @@ class PlayerGame:
             return msg
 
     def __str__(self):
-        return f'word_unknown: {self.word_unknown} \nword_sough: {self.word_sought}\nerrors {self.errors} \nstatus: {self.state}'
+        return f'word_unknown: {self.word_unknown} \nword_sough: {self.word_sought}\nerrors {self.errors} \nstatus: {self.state}\n\n'
 
     def check(self):
         return self.state
 
 
 def letter_from_player(id_player: str, letter: str, players_games) -> str:
-    player_game = players_games.setdefault(id_player, PlayerGame())
-    return player_game.trying_guess(letter.lower())
+    if id_player in players_games:
+        player_game = players_games[id_player]
+    # player_game = players_games.setdefault(id_player, GameGallow())
+        return player_game.trying_guess(letter.lower())
+    else:
+        return 'Pls click /start'  
 
 
 def test():
