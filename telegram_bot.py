@@ -1,5 +1,4 @@
 #!python3
-# pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
 
 """
@@ -33,7 +32,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-
 players_games = {}
 
 
@@ -56,8 +54,7 @@ def menu_actions(update: Update, context: CallbackContext) -> None:
     if query.data == 'start_game_gallows':
         players_games[chat_id] = GameGallow()
         update.callback_query.message.edit_text(
-            f"{update.effective_user.first_name} Let's start playing!!! Guess the word  {players_games[chat_id].word_unknown}?")
-
+            f"{update.effective_user.first_name} Let's start playing! Guess the word {players_games[chat_id].word_unknown}?")
     if query.data == 'exit':
         game_on = False
         msg = '\U0001F916 \U0001F300  \U0001F601 \U0001F60D\n'
@@ -77,23 +74,24 @@ def exit_command(update: Update, context: CallbackContext) -> None:
     if update.effective_user.id in players_games:
         players_games.pop(update.effective_user.id)
 
-    update.message.reply_text(f'Delete id = {update.effective_user.id} and Exit')
+    update.message.reply_text(
+        f'Delete id = {update.effective_user.id} and Exit')
+
 
 def stat_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /stat is issued."""
     global players_games
     msg = '\U0001F300 \n'
     for key in players_games:
-        msg+= f'Player: {key} \U0001F60D\n'
+        msg += f'Player: {key} \U0001F60D\n'
         print(players_games[key])
-        msg+= str(players_games[key])
+        msg += str(players_games[key])
     update.message.reply_text(f'Stat game {msg}\n')
 
 
 def game_gallow(update: Update, context: CallbackContext) -> None:
     global players_games
     chat_id = update.message.chat_id
-    print('chat_id = ', chat_id)
     update.message.reply_text(letter_from_player(
         chat_id, update.message.text, players_games))
 
@@ -106,11 +104,8 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("help", help_command))
     dispatcher.add_handler(CommandHandler("exit", exit_command))
-
     dispatcher.add_handler(CommandHandler("stat", stat_command))
-
     dispatcher.add_handler(CallbackQueryHandler(menu_actions))
-
     # on non command i.e message - echo the message on Telegram
     dispatcher.add_handler(MessageHandler(
         Filters.text & ~Filters.command, game_gallow))
