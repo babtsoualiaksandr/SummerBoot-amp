@@ -1,5 +1,5 @@
 #!python3
-# This program is dedicated to the public domain under the CC0 license.
+
 
 """
 

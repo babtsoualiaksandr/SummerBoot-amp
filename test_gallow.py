@@ -1,31 +1,46 @@
 import pytest
 from game_gallow import GameGallow
-from game_gallow import StateGame
+from game_gallow import StateGame, letter_from_player
 
 
 @pytest.fixture
 def greate_game():
-   return GameGallow()
+    return GameGallow()
+
 
 @pytest.fixture
 def input_value_no_letter():
-   input = '3'
-   return input
+    input = '3'
+    return input
 
-def input_value_letter():
-   input = 'q'
-   return input
+
+@pytest.fixture
+def input_value_two_letter():
+    input = 'qq'
+    return input
 
 
 def test_init_game():
     game = GameGallow()
-    assert game.state==StateGame.continues
+    assert game.state == StateGame.continues
+
 
 def test_input_no_letter(greate_game, input_value_no_letter):
     error = "Error input" in greate_game.trying_guess(input_value_no_letter)
-    assert error==True
+    assert error == True
 
-def test_input_letter(greate_game, input_value_letter):
 
-    assert "Error input" in greate_game.trying_guess(input_value_letter)==True
+def test_input_two_letter(greate_game, input_value_two_letter):
+    error = "Error input" in greate_game.trying_guess(input_value_two_letter)
+    assert error == True
+
+def test_letter_from_user(greate_game):
+    players_games={}
+    game = greate_game
+    letter_from_player('007','01',players_games) 
+    if '007' in players_games:
+       return True
+    else:
+       False
+
 

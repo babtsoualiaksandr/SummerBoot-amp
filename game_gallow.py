@@ -6,12 +6,14 @@ from enum import Enum
 
 StateGame = Enum('StateGame', 'continues losing success')
 
+
 class GameGallow:
     """
      [summary]
 
     [extended_summary]
-    """    
+    """
+
     def __init__(self) -> None:
         words = ('епам', 'лето', 'змея', 'лекция', 'учеба', 'задания', 'язык', 'английский',
                  'вебинар', 'книги', 'документация', 'получение', 'удаленная', 'работа', 'успех', 'спасибо')
@@ -32,7 +34,7 @@ class GameGallow:
         :type letter: str
         :return: [description]
         :rtype: str
-        """        
+        """
         if not self.state == StateGame.continues:
             return f'Game over {self.state} click /start or /exit'
         if (not len(letter) == 1) | letter.isdigit():
@@ -70,5 +72,8 @@ def letter_from_player(id_player: str, letter: str, players_games) -> str:
         player_game = players_games[id_player]
         return player_game.trying_guess(letter.lower())
     else:
-        return 'Pls click /start'  
+        return 'Pls click /start'
 
+
+__author__ = "Aliaksandr Babtsou"
+__copyright__ = "Copyright 2021, The Summer Bootcamp"
