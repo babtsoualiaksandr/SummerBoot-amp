@@ -2,16 +2,14 @@
 
 
 """
-
 Usage:
-
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
 
 import logging
 import re
-import configparser
+import os
 
 from telegram import Update, ForceReply, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext, CallbackQueryHandler, CommandHandler, Filters, MessageHandler, Updater
@@ -20,9 +18,10 @@ from telegram.ext import CallbackContext, CallbackQueryHandler, CommandHandler, 
 from game_gallow import GameGallow
 from game_gallow import letter_from_player
 
+from dotenv import load_dotenv
 
-config = configparser.ConfigParser()
-config.read("settings.ini")
+load_dotenv()
+API_TLG_TOKEN = os.environ.get('API_TLG_TOKEN')
 
 
 logging.basicConfig(
@@ -34,9 +33,6 @@ logger = logging.getLogger(__name__)
 
 players_games = {}
 
-
-# Define a few command handlers. These usually take the two arguments update and
-# context.
 def start(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
@@ -105,7 +101,7 @@ def game_gallow(update: Update, context: CallbackContext) -> None:
 
 def main() -> None:
     updater = Updater(
-        config["Telegram"]["token"], use_context=True)
+        API_TLG_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
 
     dispatcher.add_handler(CommandHandler("start", start))
