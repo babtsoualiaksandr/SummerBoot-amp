@@ -4,7 +4,7 @@ from game_gallow import StateGame, letter_from_player
 
 
 @pytest.fixture
-def greate_game():
+def create_game():
     return GameGallow()
 
 
@@ -25,18 +25,18 @@ def test_init_game():
     assert game.state == StateGame.continues
 
 
-def test_input_no_letter(greate_game, input_value_no_letter):
-    error = "Error input" in greate_game.trying_guess(input_value_no_letter)
+def test_input_no_letter(create_game, input_value_no_letter):
+    error = "Error input" in create_game.trying_guess(input_value_no_letter)
     assert error == True
 
 
-def test_input_two_letter(greate_game, input_value_two_letter):
-    error = "Error input" in greate_game.trying_guess(input_value_two_letter)
+def test_input_two_letter(create_game, input_value_two_letter):
+    error = "Error input" in create_game.trying_guess(input_value_two_letter)
     assert error == True
 
-def test_letter_from_user(greate_game):
+def test_letter_from_user(create_game):
     players_games={}
-    game = greate_game
+    game = create_game
     letter_from_player('007','01',players_games) 
     if '007' in players_games:
        return True

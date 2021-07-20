@@ -26,7 +26,7 @@ config.read("settings.ini")
 
 
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 
 logger = logging.getLogger(__name__)
@@ -40,6 +40,8 @@ players_games = {}
 def start(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
+    logger.info(f'{user.first_name}   Start Game')
+    
     menu_main = [[InlineKeyboardButton('To start playing ', callback_data='start_game_gallows')],
                  [InlineKeyboardButton('Not!! Better to learn Python', callback_data='exit')], ]
     reply_markup = InlineKeyboardMarkup(menu_main)
@@ -49,9 +51,11 @@ def start(update: Update, context: CallbackContext) -> None:
 
 def menu_actions(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
+    user = update.effective_user
     global players_games
     chat_id = update.effective_user.id
     if query.data == 'start_game_gallows':
+        logger.info(f'{user.first_name}   select start_game_gallows')
         players_games[chat_id] = GameGallow()
         update.callback_query.message.edit_text(
             f"{update.effective_user.first_name} Let's start playing! Guess the word {players_games[chat_id].word_unknown}?")
@@ -70,10 +74,11 @@ def help_command(update: Update, context: CallbackContext) -> None:
 def exit_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /exit is issued."""
     global players_games
-
+    user = update.effective_user
+    logger.info(f'{user.first_name}   select exit')
     if update.effective_user.id in players_games:
         players_games.pop(update.effective_user.id)
-
+    
     update.message.reply_text(
         f'Delete id = {update.effective_user.id} and Exit')
 
@@ -91,7 +96,9 @@ def stat_command(update: Update, context: CallbackContext) -> None:
 
 def game_gallow(update: Update, context: CallbackContext) -> None:
     global players_games
+    user = update.effective_user
     chat_id = update.message.chat_id
+    logger.info(f'{user.first_name}  id= {chat_id} press <{update.message.text}>')
     update.message.reply_text(letter_from_player(
         chat_id, update.message.text, players_games))
 
