@@ -18,7 +18,7 @@ class GameGallow:
         words = ('епам', 'лето', 'змея', 'лекция', 'учеба', 'задания', 'язык', 'английский',
                  'вебинар', 'книги', 'документация', 'получение', 'удаленная', 'работа', 'успех', 'спасибо')
         random.seed()
-        self.word_sought = words[random.randint(0, len(words)-1)]
+        self.word_sought = random.choices(words)
         self.word_unknown = '-'*len(self.word_sought)
         self.errors = 0
         self.errors_max = 10
