@@ -14,9 +14,9 @@ try:
     with open('INPUT.TXT', 'r') as f:
         input_values = f.readlines()
     [n, m, h] = [int(x) for x in input_values]
-    if not (1 <= n & n <= h & h <= 100):
+    if not (1 <= n <=  h <= 100):
         raise Exception('1 ≤ N ≤ H ≤ 100')
-    if not (1 <= m & m <= 100):
+    if not (1 <= m <= 100):
         raise Exception('1 ≤ M ≤ 100')
 except Exception as ex:
     print('Input Error', ex)
