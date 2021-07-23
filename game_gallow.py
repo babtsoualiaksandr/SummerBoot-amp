@@ -9,9 +9,7 @@ StateGame = Enum('StateGame', 'continues losing success')
 
 class GameGallow:
     """
-     [summary]
 
-    [extended_summary]
     """
 
     def __init__(self) -> None:
@@ -26,10 +24,6 @@ class GameGallow:
 
     def trying_guess(self, letter: str) -> str:
         """
-        trying_guess [summary]
-
-        [extended_summary]
-
         :param letter: [description]
         :type letter: str
         :return: [description]
